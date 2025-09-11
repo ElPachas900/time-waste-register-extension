@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <h2 id="title">Time waste register</h2>
+    <div class="mytabs">
+      <input type="radio" id="tabfree" name="mytabs" checked="checked">
+      <label for="tabfree" id="first">Timers</label>
+      <div class="tab">
+        <h2>Timers</h2>
+        <p>Synced with the <a href="https://time-waste-register.neocities.org/" target="_blank">twr website.</a></p>
+        <div id="timers_scroller" style="overflow-y: scroll;">
+          <!-- the website timers go here! -->
+        </div>
+      </div>
+
+      <input type="radio" id="tabkkw" name="mytabs">
+      <label for="tabkkw" id="second">Corner</label>
+      <div class="tab">
+        <h2>Corner</h2>
+        <p>The time you spent on.</p>
+        <div id="timers_modules">
+          <div class="circle"><p><span id="e_twr_tab">00:00:00:00</span> Time spent on this tab.</p></div>
+          <div class="circle"><p><span id="e_twr_domain">00:00:00:00</span> Time spent on this domain.</p></div>
+          <div class="circle"><p><span id="e_twr_browser">00:00:00:00</span> Time spent on this browser.</p></div>
+          <div class="circle" id="console_timers">
+            <p><span style="color:#922121;">B</span>
+              <i id="browser_playBtn" class="fa-solid fa-pause"></i>
+              <i id="browserVisibility" class="fa-solid fa-eye"></i></p>
+            <p><span style="color:#218a21;">D</span>
+              <i id="domain_playBtn" class="fa-solid fa-pause"></i>
+              <i id="domainVisibility" class="fa-solid fa-eye"></i></p>
+            <p><span style="color:#3131c0;">T</span>
+              <i id="tab_playBtn" class="fa-solid fa-pause"></i>
+              <i id="tabVisibility" class="fa-solid fa-eye"></i></p>
+          </div>
+        </div>
+      </div>
+
+      <input type="radio" id="tabopt" name="mytabs">
+      <label for="tabopt" id="third">Opt.</label>
+      <div class="tab">
+        <h2>Options</h2>
+        <p>murder gerin away</p>
+        <input type="checkbox" class="menuOption" data-option="linkify"> kaka weeee
+        custom css
+        <input type="number" id="quantity" value="50" name="quantity" min="1" max="100"> timer ms
+        <input id="postFile" name="upfile" type="file" tabindex="8">
+      </div>
+    </div>
+
+    <!-- IMPORTANT: this is the POPUP script, not the page content script -->
+    <script src="scripts/popup.js" defer></script>
+  </body>
+</html>

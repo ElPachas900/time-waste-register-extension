@@ -1,3 +1,45 @@
+const fileInput = document.getElementById("postFile");
+const resetBtn = document.getElementById("resetStyle");
+
+function applyCSS(cssContent) {
+  let oldStyle = document.getElementById("uploaded-style");
+  if (oldStyle) oldStyle.remove();
+
+  if (!cssContent) return;
+
+  const style = document.createElement("style");
+  style.id = "uploaded-style";
+  style.textContent = cssContent;
+  document.head.appendChild(style);
+}
+
+chrome.storage.local.get("userCSS", ({ userCSS }) => {
+  if (userCSS) {
+    applyCSS(userCSS);
+  }
+});
+
+fileInput.addEventListener("change", function (event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const cssContent = e.target.result;
+
+    chrome.storage.local.set({ userCSS: cssContent }, () => {
+      applyCSS(cssContent);
+    });
+  };
+  reader.readAsText(file);
+});
+
+resetBtn.addEventListener("click", () => {
+  chrome.storage.local.remove("userCSS", () => {
+    applyCSS(null);
+    fileInput.value = "";
+  });
+});
 
 const eTab = document.getElementById('e_twr_tab');
 const eDomain = document.getElementById('e_twr_domain');
@@ -66,7 +108,7 @@ function setupVisibilityButton(btn, timerId) {
   });
 }
 
-const timersMap = new Map(); // id => state { node, timerEl, stopBtn, removeBtn, running, startTime, elapsed, tabId, interval }
+const timersMap = new Map();
 
 function htmlToElement(html) {
   const tpl = document.createElement('template');
@@ -98,28 +140,76 @@ function updateDisplayOnce(state) {
   if (state.timerEl) state.timerEl.textContent = fmtCs(ms);
 }
 
+function truncateReplaceLastTwo(text) {
+  if (!text) return "";
+  if (text.length <= 8) return text;
+  return text.slice(0, text.length - 2) + "...";
+}
+
+function applyTruncation(clone) {
+  // Go through child nodes of the cloned wrapper
+  for (const node of clone.childNodes) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const txt = node.nodeValue.trim();
+      if (!txt) continue;
+      if (/^[\d\s:.,]+$/.test(txt)) continue;
+
+      node.nodeValue = truncateReplaceLastTwo(txt);
+      return;
+    }
+  }
+}
+
+
 function createTimerDOM(entry) {
   const id = entry.timer?.id || entry.id || (entry.html && (entry.html.match(/id="([^"]+)"/) || [])[1]);
   if (!id) return null;
   if (timersMap.has(id)) return timersMap.get(id).node;
 
-  const wrapper = document.createElement('div');
-  wrapper.className = 'timer-entry';
+  const wrapper = document.createElement("div");
+  wrapper.className = "timer-entry";
   wrapper.dataset.id = id;
-  wrapper.dataset.tabId = entry.tabId ?? entry.timer?.tabId ?? '';
+  wrapper.dataset.tabId = entry.tabId ?? entry.timer?.tabId ?? "";
 
   const contentEl = htmlToElement(entry.html);
-  if (contentEl) wrapper.appendChild(contentEl.cloneNode(true));
-  else {
-    const div = document.createElement('div');
-    div.innerHTML = entry.html || `<div>${id}</div>`;
-    wrapper.appendChild(div);
+  const clone = contentEl ? contentEl.cloneNode(true) : document.createElement("div");
+  if (!contentEl) clone.innerHTML = entry.html || `<div>${id}</div>`;
+
+  const innerTimerEl = clone.querySelector('[id^="timer"]');
+  const candidates = clone.querySelectorAll("span,div,a,p");
+  let labelDone = false;
+  for (const el of candidates) {
+    const txt = el.textContent?.trim();
+    if (!txt) continue;
+    if (innerTimerEl && el.contains(innerTimerEl)) continue;
+    if (/^[\d\s:.,]+$/.test(txt)) continue;
+    el.textContent = truncateReplaceLastTwo(txt);
+    labelDone = true;
+    break;
   }
+
+  if (!labelDone) {
+    const walker = document.createTreeWalker(clone, NodeFilter.SHOW_TEXT, null, false);
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      const txt = node.nodeValue?.trim();
+      if (!txt) continue;
+      if (innerTimerEl && innerTimerEl.contains(node.parentElement)) continue;
+      if (/^[\d\s:.,]+$/.test(txt)) continue;
+      node.nodeValue = truncateReplaceLastTwo(txt);
+      break;
+    }
+  }
+
+  applyTruncation(clone);
+
+  wrapper.appendChild(clone);
   timersContainer.appendChild(wrapper);
 
-  const timerEl = wrapper.querySelector('[id^="timer"]') || wrapper.querySelector('a,span');
-  const stopBtn = wrapper.querySelector('[id^="stop-button-"]') || wrapper.querySelector('[data-stop]');
-  const removeBtn = wrapper.querySelector('[id^="remove-button-"]') || wrapper.querySelector('[data-remove]');
+
+  const timerEl = wrapper.querySelector('[id^="timer"]') || wrapper.querySelector("a,span");
+  const stopBtn = wrapper.querySelector('[id^="stop-button-"]') || wrapper.querySelector("[data-stop]");
+  const removeBtn = wrapper.querySelector('[id^="remove-button-"]') || wrapper.querySelector("[data-remove]");
 
   const state = {
     id,
@@ -131,21 +221,21 @@ function createTimerDOM(entry) {
     startTime: entry.timer?.startTime ?? null,
     elapsed: entry.timer?.elapsed ?? 0,
     tabId: entry.tabId ?? entry.timer?.tabId ?? null,
-    interval: null
+    interval: null,
   };
 
   if (stopBtn) {
-    stopBtn.style.cursor = 'pointer';
-    stopBtn.textContent = (entry.timer?.running) ? "⏸️" : "▶️";
-    stopBtn.addEventListener('click', (e) => {
+    stopBtn.style.cursor = "pointer";
+    stopBtn.textContent = entry.timer?.running ? "⏸️" : "▶️";
+    stopBtn.addEventListener("click", (e) => {
       e.preventDefault();
       const cur = timersMap.get(id);
       if (!cur) return;
-      const action = cur.running ? 'pause' : 'resume';
+      const action = cur.running ? "pause" : "resume";
 
-      chrome.runtime.sendMessage({ type: 'twr_control', action, timerId: id, tabId: cur.tabId }, () => {});
+      chrome.runtime.sendMessage({ type: "twr_control", action, timerId: id, tabId: cur.tabId }, () => {});
       if (cur.running) {
-        cur.elapsed = cur.startTime ? Date.now() - cur.startTime : (cur.elapsed || 0);
+        cur.elapsed = cur.startTime ? Date.now() - cur.startTime : cur.elapsed || 0;
         cur.running = false;
         cur.startTime = null;
         stopTick(id);
@@ -161,12 +251,12 @@ function createTimerDOM(entry) {
   }
 
   if (removeBtn) {
-    removeBtn.style.cursor = 'pointer';
-    removeBtn.addEventListener('click', (e) => {
+    removeBtn.style.cursor = "pointer";
+    removeBtn.addEventListener("click", (e) => {
       e.preventDefault();
       const cur = timersMap.get(id);
       if (!cur) return;
-      chrome.runtime.sendMessage({ type: 'twr_control', action: 'remove', timerId: id, tabId: cur.tabId }, () => {});
+      chrome.runtime.sendMessage({ type: "twr_control", action: "remove", timerId: id, tabId: cur.tabId }, () => {});
       stopTick(id);
       try { cur.node.remove(); } catch {}
       timersMap.delete(id);
@@ -176,17 +266,17 @@ function createTimerDOM(entry) {
   timersMap.set(id, state);
   if (state.running) startTick(id);
   else updateDisplayOnce(state);
+
   return wrapper;
 }
 
-// ========== INIT ==========
+
+
 document.addEventListener("DOMContentLoaded", () => {
-  // Load existing shared timers
   chrome.storage.local.get({ sharedTimers: [] }, (data) => {
     (data.sharedTimers || []).forEach(entry => createTimerDOM(entry));
   });
 
-  // Hook up corner timer buttons
   setupPlayButton(browserPlayBtn, "browser");
   setupPlayButton(domainPlayBtn, "domain");
   setupPlayButton(tabPlayBtn, "tab");

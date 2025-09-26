@@ -1,8 +1,7 @@
 html{
-    height: calc(200px * 1.618033988749); /* ;) + 48px*/
+    height: calc(200px * 1.618033988749);
     width: 200px;
     background: linear-gradient(#c4fff2, #00ffc8 33%);
-    /* linear-gradient(#5e5e5e 85%, #45454f 100%); */
 }
 
 .mytabs {
@@ -31,15 +30,15 @@ h2 {
 .mytabs label {
     padding: 0 13px;
     color: #00a07d;
-    /* font-weight: bold; */
     background-color: #fcf25c;
     background-image: linear-gradient(#c4fff2, #00ffc8);
     border: 2px solid #00ffc8;
-    /* border-radius: 10px 0px 5px 0px; */
     border-bottom: none;
 }
 
-#first  { border-radius: 10px 5px 0px 0px; margin-left: 8px; }
+#first  { border-radius: 10px 5px 0px 0px;  
+  margin-left: 8px;
+}
 #second { border-radius: 10px 5px 0px 0px; }
 #third  { border-radius: 10px 5px 0px 0px; }
 
@@ -57,7 +56,6 @@ h2 {
 
     
     color: #867f17;
-    /* text-shadow: 2px 0 #fcf25c, -2px 0 #fcf25c, 0 2px #fcf25c, 0 -2px #fcf25c, 1px 1px #fcf25c, -1px -1px #fcf25c, 1px -1px #fcf25c, -1px 1px #fcf25c; */
 
 }
 
@@ -73,7 +71,7 @@ h2 {
 
 .mytabs input[type="radio"]:checked + label {
     background-color: #fcf25c;
-    background-image: linear-gradient(#fff7d6, #fcf25c); /* #fcda44*/ 
+    background-image: linear-gradient(#fff7d6, #fcf25c);
     color: #867f17;
     border: 2px solid #fcf25c;
 }
@@ -84,38 +82,36 @@ h2 {
     background-color: none;
     height: 175px;
     margin-top: none;
-    /* max-width: 186px !important; */
 }
 
 ::-webkit-scrollbar {
   width: 6px;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
   background: none; 
 }
  
-/* Handle */
 ::-webkit-scrollbar-thumb {
   background: #867f17;
   border-radius: 10px;
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #867f17; 
 }
 
 
- .inside {
+.inside {
   position: relative;
   display: flex;
-  margin-bottom: 6px;
+  align-items: center;
   padding: 10px;
   background: linear-gradient(#fff7d6, #fcf25c);
   border-radius: 15px;
   color: #867f17;
+  max-width: 160px;
+  gap: 4px;
 }
 
 i {
@@ -123,19 +119,14 @@ i {
   padding: none;
 }
 
-.inside [id^="stop-button-"] {
-    margin-left: auto;
-}
-
-
-.inside::before {
+.inside::before { 
   content: "";
   position: absolute;
   inset: 2px;
   border: 2px solid #867f17;
   border-radius: calc(15px - 5px);
   pointer-events: none;
-} 
+}
 
 #timers_modules {
   display: flex;
@@ -192,4 +183,138 @@ a {
 #e_twr_tab {
   color: blue;
   text-align: center;
+}
+[id^="remove-button-"] {
+  margin: 0px !important;
+}
+[id^="remove-button-"],
+[id^="timer"],
+.inside [id^="stop-button-"] {
+  margin: 0 !important;
+}
+
+.inside i {
+  margin-top: 3px;
+  margin-right: 0 !important;
+}
+.inside i + span,
+.inside i + a,
+.inside span + a {
+  margin-left: 6px;
+}
+
+.inside a + a {
+  margin-left: 4px;
+}
+#timers_scroller .inside {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background: linear-gradient(#fff7d6, #fcf25c);
+  border-radius: 15px;
+  color: #867f17;
+  max-width: 180px;
+  box-sizing: border-box;
+  gap: 4px;
+}
+
+#timers_scroller .inside::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border: 2px solid #867f17;
+  border-radius: calc(15px - 5px);
+  pointer-events: none;
+}
+
+#timers_scroller .inside > * {
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+#timers_scroller .inside :not([id^="timer"]):not([id^="stop-button-"]):not([id^="remove-button-"]) + [id^="timer"] {
+  margin-left: 0;
+}
+
+#timers_scroller .inside :not([id^="timer"]):not([id^="stop-button-"]):not([id^="remove-button-"]) ~ [id^="stop-button-"],
+#timers_scroller .inside :not([id^="timer"]):not([id^="stop-button-"]):not([id^="remove-button-"]) ~ [id^="remove-button-"] {
+  margin-left: 4px;
+}
+
+#timers_scroller .inside > [id^="timer"]:first-child {
+  margin-right: auto;
+}
+
+#timers_scroller .inside a + a {
+  margin-left: 2px;
+}
+#timers_scroller .inside {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  background: linear-gradient(#fff7d6, #fcf25c);
+  border-radius: 15px;
+  color: #867f17;
+  width: 180px;
+  box-sizing: border-box;
+  gap: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+#timers_scroller .inside::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border: 2px solid #867f17;
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+#timers_scroller .inside > * {
+  margin: 0;
+  display: inline-flex ;
+  align-items: center;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+#timers_scroller .inside [id^="timer"] {
+  flex: 1 1 auto;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+#timers_scroller .inside > [id^="timer"]:first-child {
+  margin-right: auto;
+}
+ 
+#timers_scroller .inside :not([id^="timer"]):not([id^="stop-button-"]):not([id^="remove-button-"]) + [id^="timer"] {
+  margin-left: 0;
+}
+
+#timers_scroller .inside [id^="stop-button-"],
+#timers_scroller .inside [id^="remove-button-"] {
+  flex: 0 0 auto;
+  margin-left: 4px;
+}
+
+#infoFile {
+  margin-top: 145px;
+  margin-bottom: 0px;
+}
+
+#resetStyle {
+  margin-bottom: -1px;
+    margin-top: -16px;
+    margin-left: 133px;
+    background: none;
+    border: none;
+    color: #867f17;
+    font-weight: bold;
 }

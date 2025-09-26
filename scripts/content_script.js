@@ -1,7 +1,13 @@
-// scripts/content_script.js
 (function () {
   const ID = 'twr_timer';
   if (document.getElementById(ID)) return;
+  
+  function shortenText(text) {
+  if (text.length > 8) {
+    return text.slice(0, -2) + "...";
+  }
+  return text;
+  }
 
   const container = document.createElement('div');
   container.id = ID;
@@ -50,7 +56,6 @@
   setInterval(updateOverlay, 1000);
   updateOverlay();
 
-  // incoming messages
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (!msg || typeof msg.type !== 'string') return;
     if (msg.type === 'twr_set_hidden' && msg.id) {
@@ -65,7 +70,6 @@
     }
   });
 
-  // forward page -> background
   window.addEventListener('message', (event) => {
     if (event.source !== window || !event.data || typeof event.data.type !== 'string') return;
     const msg = event.data;

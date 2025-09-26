@@ -83,9 +83,9 @@ function setupVisibilityButton(btn, target) {
   });
 }
 
-setupVisibilityButton(browserVisibilityBtn, "p:nth-child(1)"); // red
-setupVisibilityButton(domainVisibilityBtn, "p:nth-child(2)"); // green
-setupVisibilityButton(tabVisibilityBtn, "p:nth-child(3)");   // blue
+setupVisibilityButton(browserVisibilityBtn, "p:nth-child(1)");
+setupVisibilityButton(domainVisibilityBtn, "p:nth-child(2)");
+setupVisibilityButton(tabVisibilityBtn, "p:nth-child(3)");
 
 setInterval(update, 500);
 update();
